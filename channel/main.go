@@ -1,7 +1,9 @@
 package main
 
 import (
+
 	"fmt"
+
 )
 
 /*
@@ -65,20 +67,20 @@ func main() {
 	// salutation, ok := <-stringStream
 	// fmt.Println(salutation, ok)
 
-	intStream := make(chan int)
+	// intStream := make(chan int)
 
-	go func() {
-		defer close(intStream)
-		for i := range 10 {
-			intStream <- i
-		}
-	}()
+	// go func() {
+	// 	defer close(intStream)
+	// 	for i := range 10 {
+	// 		intStream <- i
+	// 	}
+	// }()
 
-	for i := range intStream {
-		fmt.Println(i)
-	}
+	// for i := range intStream {
+	// 	fmt.Println(i)
+	// }
 
-	fmt.Println("Done")
+	// fmt.Println("Done")
 
 	/*
 		In our main goroutine, we prepare some resources or do setup work first. After that preparation is complete, we close the channel to signal all waiting goroutines to proceed with their work.
@@ -162,6 +164,61 @@ func main() {
 			}
 
 		// Using bytes.Buffer collects output from multiple goroutines without mixing it up.
-		// Printing all at once keeps output ordered and clear. Direct fmt.Printf can jumble output when goroutines print concurrently.
-	*/
+		// Printing all at once keeps output ordered and clear. Direct fmt.Printf can jumble output when goroutines print concurrently.]
+
+		Result of channel operations given a channel’s state
+			Operation Channel state Result
+
+			Read nil Block
+
+			Open and Not Empty Value
+
+		
+			Open and Empty Block
+
+			Closed <default value>, false
+
+			Write Only Compilation Error
+
+			Write nil Block
+
+			Open and Full Block
+
+			Open and Not Full Write Value
+
+			Closed panic
+
+			Receive Only Compilation Error
+			close nil panic
+			Open and Not Empty Closes Channel; reads succeed until channel is drained,
+			then reads produce default value
+			Open and Empty Closes Channel; reads produces default value
+			Closed panic
+			Receive Only Compilation Error
+		*/
+
+
+		/*
+
+			the following code is the idiomatc way to use channels to show proper ownership of channels
+
+		*/
+
+		chanOwner := func() <- chan int {
+			dataStream := make(chan int, 5)
+			go func(){
+				defer close(dataStream)
+				for i := 0; i < 6; i++ {
+					dataStream <- i
+				}
+			}()
+			return dataStream
+		}
+
+		dataStream := chanOwner()
+		for data := range dataStream {
+			fmt.Printf("Received: %d\n", data)
+		}
+
+		fmt.Println("Done receiving!")
 }
