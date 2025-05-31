@@ -221,4 +221,56 @@ func main() {
 		}
 
 		fmt.Println("Done receiving!")
+
+		/*
+			we can use select to implement a timeout
+
+
+    done := make(chan interface{})
+
+    // Close done after 5 seconds
+    go func() {
+        time.Sleep(5 * time.Second)
+        close(done)
+    }()
+
+    workCounter := 0
+
+
+    for {
+        select {
+        case <-done:
+            // Exit loop when done is closed
+            break loop
+        default:
+            // Do work if done is not closed
+        }
+
+        workCounter++
+        time.Sleep(1 * time.Second) // Simulate work
+    }
+
+    fmt.Printf("Completed %d cycles of work before stopping.\n", workCounter)
+
+    // Example of non-blocking select with default
+    ch := make(chan string)
+
+    select {
+    case msg := <-ch:
+        fmt.Println("Received:", msg)
+    default:
+        fmt.Println("No message received")
+    }
+
+    // Uncommenting the following will block forever
+    // select {}
+}
+
+			case <-time.After(10 * time.Second):
+				fmt.Println("Timed out!")
+				return
+			case <-dataStream:
+				fmt.Println("Received!")
+			}
+		*/
 }
