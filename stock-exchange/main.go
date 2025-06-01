@@ -14,10 +14,10 @@ import (
 )
 
 type Order struct {
-	ID     int
-	Price  float64
-	Amount int
-	Side   string
+	id     int
+	price  float64
+	amount int
+	side   string
 }
 
 type OrderBook struct {
@@ -34,14 +34,15 @@ func NewOrderBook() *OrderBook {
 }
 
 func (ob *OrderBook) PlaceOrder(side string, price float64, amount int) int {
+	//This lock is for writing to the order book so that no other goroutine can read or write to the order book concurrently
 	ob.mu.Lock()
 	defer ob.mu.Unlock()
 
 	order := Order{
-		ID:     len(ob.buys) + len(ob.sells) + 1,
-		Price:  price,
-		Amount: amount,
-		Side:   side,
+		id:     len(ob.buys) + len(ob.sells) + 1,
+		price:  price,
+		amount: amount,
+		side:   side,
 	}
 
 	if side == "buy" {
@@ -51,15 +52,16 @@ func (ob *OrderBook) PlaceOrder(side string, price float64, amount int) int {
 	}
 
 	fmt.Printf("Placed %s order: %+v\n", side, order)
-	return order.ID
+	return order.id
 }
 
+//user can only canel his own orders not others
 func (ob *OrderBook) CancelOrder(id int) bool {
 	ob.mu.Lock()
 	defer ob.mu.Unlock()
 
 	for i, order := range ob.buys {
-		if order.ID == id {
+		if order.id == id {
 			ob.buys = append(ob.buys[:i], ob.buys[i+1:]...)
 			fmt.Printf("Canceled buy order ID: %d\n", id)
 			return true
@@ -67,7 +69,7 @@ func (ob *OrderBook) CancelOrder(id int) bool {
 	}
 
 	for i, order := range ob.sells {
-		if order.ID == id {
+		if order.id == id {
 			ob.sells = append(ob.sells[:i], ob.sells[i+1:]...)
 			fmt.Printf("Canceled sell order ID: %d\n", id)
 			return true
