@@ -9,14 +9,21 @@ import (
 var (
 	dishesReady = 0
 )
+
 // a cond  call is must be wrappend  inside a mutex lock and unlock
+/*
+	synch.Cond maintains an internal FIFO queue of goroutines waiting on a condition. When Signal() is called, it wakes the goroutine that has been waiting the longest (the front of the queue), ensuring fair ordering. In contrast, Broadcast() wakes all waiting goroutines simultaneously, allowing them all to re-check the condition and proceed if ready. This design provides efficient coordination among multiple goroutines, making it much more performant and straightforward than trying to implement similar behavior using channels. The FIFO management ensures no goroutine is starved or skipped during signaling.
+
+
+
+*/
 
 var (
-	notificationReady = false
+	notificationReady   = false
 	notificationMessage string
-	mu = sync.Mutex{}
-	cond = sync.NewCond(&mu)
-	wg = sync.WaitGroup{}
+	mu                  = sync.Mutex{}
+	cond                = sync.NewCond(&mu)
+	wg                  = sync.WaitGroup{}
 )
 
 func waiter(id int) {
@@ -46,8 +53,7 @@ func cook(count int) {
 func main() {
 	waiterCount := 10
 	chefCount := 10
-	dishesPerChef := 1 
-
+	dishesPerChef := 1
 
 	for i := 0; i < waiterCount; i++ {
 		wg.Add(1)
@@ -62,7 +68,7 @@ func main() {
 	wg.Wait()
 	fmt.Println("All waiters have taken the dish")
 	notification()
-	
+
 }
 
 func client(id int) {
@@ -76,7 +82,7 @@ func client(id int) {
 	mu.Unlock()
 }
 
-func server() {	
+func server() {
 	time.Sleep(time.Second * 2)
 	mu.Lock()
 	notificationReady = true
