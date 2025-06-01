@@ -95,7 +95,7 @@ func main() {
 	ob := NewOrderBook()
 	var wg sync.WaitGroup
 
-	for i := 0; i < 5; i++ {
+	for i := range 5 {
 		wg.Add(1)
 		go func(i int) {
 			defer wg.Done()
@@ -103,7 +103,7 @@ func main() {
 		}(i)
 	}
 
-	for i := 0; i < 5; i++ {
+	for i := range 5 {
 		wg.Add(1)
 		go func(i int) {
 			defer wg.Done()
@@ -113,13 +113,13 @@ func main() {
 
 	wg.Wait()
 
-	for i := 0; i < 3; i++ {
+	for i := range 3 {
 		wg.Add(1)
 		go func(i int) {
 			defer wg.Done()
 			buys, sells := ob.GetOrderBook()
-			fmt.Printf("[Reader %d] Buys: %+v\n", i, buys)
-			fmt.Printf("[Reader %d] Sells: %+v\n", i, sells)
+			fmt.Printf("[Reader %d] Buys: %+v\n", i+1, buys)
+			fmt.Printf("[Reader %d] Sells: %+v\n", i+1, sells)
 		}(i)
 	}
 
